@@ -1,35 +1,50 @@
-UNAME := $(shell uname)
-MASTER_INSTALLDIR := /opt/etherlab
-INCLUDE_DIRS = -I include
-INCLUDE_DIRS += -I ../app_linux_ctrlproto-master-example/config/motor
-INCLUDE_DIRS += -I ../lib_linux_ctrlproto/include/
-INCLUDE_DIRS += -I ../inc_ctrlproto-common/
-INCLUDE_DIRS += -I ../../sc_sncn_ethercat/module_ethercat/src/canod/
-INCLUDE_DIRS += -I $(MASTER_INSTALLDIR)/include
-INCLUDE_DIRS += -I ../../sc_sncn_motorcontrol/module_common/include
-INCLUDE_DIRS += -I ../../sc_sncn_motorcontrol/module_profile/include
-LIB_DIRS += -L $(MASTER_INSTALLDIR)/lib
+# Installation directory of the  EtherCAT Master by IgH EtherLAB
+ETHERCAT_MASTER_INSTALLDIR := /opt/etherlab
 
 LIBS += -lethercat -lm
+
+MOTORCONTROL_KIT_PATH := ..
+MOTORCONTROL_PATH := ..
+
+ifneq (,$(wildcard ../../sw_sncn_motorcontrol_ethercat_kit/.))
+	MOTORCONTROL_KIT_PATH := ../../sw_sncn_motorcontrol_ethercat_kit
+endif
+
+ifneq (,$(wildcard ../../sc_sncn_motorcontrol/.))
+	MOTORCONTROL_PATH := ../../sc_sncn_motorcontrol
+endif
+
+INCLUDE_DIRS += -I $(ETHERCAT_MASTER_INSTALLDIR)/include
+INCLUDE_DIRS += -I include
+INCLUDE_DIRS += -I ../inc_ctrlproto-common/
+INCLUDE_DIRS += -I ../lib_linux_ctrlproto/include/
+INCLUDE_DIRS += -I $(MOTORCONTROL_KIT_PATH)/motor_config
+INCLUDE_DIRS += -I $(MOTORCONTROL_PATH)/module_motorcontrol_common/include
+INCLUDE_DIRS += -I $(MOTORCONTROL_PATH)/module_profile/include
+INCLUDE_DIRS += -I $(MOTORCONTROL_PATH)/module_qei/include
+INCLUDE_DIRS += -I $(MOTORCONTROL_PATH)/module_hall/include
+
+LIB_DIRS += -L $(ETHERCAT_MASTER_INSTALLDIR)/lib
+
+# Needed for checking if Linux machine
+UNAME := $(shell uname)
 
 all:
 
 ifneq "$(UNAME)" "Linux"
-		@echo
 		@echo "----------------------------------------------------------------------------------------------------"
 		@echo "||Your System isn't Linux, so the ctrlproto libary for the Linux Ethercat Master can not be built!||"
 		@echo "----------------------------------------------------------------------------------------------------"
-		@echo
 else
-		@if test -d $(MASTER_INSTALLDIR); \
+		@if test -d $(ETHERCAT_MASTER_INSTALLDIR); \
 		then \
 		mkdir lib -p;\
-		gcc ../../sc_sncn_motorcontrol/module_profile/profile_velocity_mode/profile_velocity.c  $(INCLUDE_DIRS) $(LIBS) $(LIB_DIRS) -o lib/libsncn_velocity.so -lstdc++ -shared -fPIC;\
-		gcc -c ../../sc_sncn_motorcontrol/module_profile/profile_velocity_mode/profile_velocity.c  $(INCLUDE_DIRS) $(LIBS) $(LIB_DIRS) -o lib/libsncn_velocity.o;\
-		gcc ../../sc_sncn_motorcontrol/module_profile/profile_position_mode/profile_position.c $(INCLUDE_DIRS) $(LIBS) $(LIB_DIRS) -o lib/libsncn_position.so -lstdc++ -shared -fPIC;\
-		gcc -c ../../sc_sncn_motorcontrol/module_profile/profile_position_mode/profile_position.c  $(INCLUDE_DIRS) $(LIBS) $(LIB_DIRS) -o lib/libsncn_position.o;\
-		gcc ../../sc_sncn_motorcontrol/module_profile/profile_linear_mode/profile_linear.c  $(INCLUDE_DIRS) $(LIBS) $(LIB_DIRS) -o lib/libsncn_linear.so -lstdc++ -shared -fPIC;\
-		gcc -c ../../sc_sncn_motorcontrol/module_profile/profile_linear_mode/profile_linear.c  $(INCLUDE_DIRS) $(LIBS) $(LIB_DIRS) -o lib/libsncn_linear.o;\
+		gcc $(MOTORCONTROL_PATH)/module_profile/profile_velocity_mode/profile_velocity.c  $(INCLUDE_DIRS) $(LIBS) $(LIB_DIRS) -o lib/libsncn_velocity.so -lstdc++ -shared -fPIC;\
+		gcc -c $(MOTORCONTROL_PATH)/module_profile/profile_velocity_mode/profile_velocity.c  $(INCLUDE_DIRS) $(LIBS) $(LIB_DIRS) -o lib/libsncn_velocity.o;\
+		gcc $(MOTORCONTROL_PATH)/module_profile/profile_position_mode/profile_position.c $(INCLUDE_DIRS) $(LIBS) $(LIB_DIRS) -o lib/libsncn_position.so -lstdc++ -shared -fPIC;\
+		gcc -c $(MOTORCONTROL_PATH)/module_profile/profile_position_mode/profile_position.c  $(INCLUDE_DIRS) $(LIBS) $(LIB_DIRS) -o lib/libsncn_position.o;\
+		gcc $(MOTORCONTROL_PATH)/module_profile/profile_linear_mode/profile_linear.c  $(INCLUDE_DIRS) $(LIBS) $(LIB_DIRS) -o lib/libsncn_linear.so -lstdc++ -shared -fPIC;\
+		gcc -c $(MOTORCONTROL_PATH)/module_profile/profile_linear_mode/profile_linear.c  $(INCLUDE_DIRS) $(LIBS) $(LIB_DIRS) -o lib/libsncn_linear.o;\
 		gcc src/drive_function.c  $(INCLUDE_DIRS) $(LIBS) $(LIB_DIRS) -o lib/libsncn_drive_function.so -lstdc++ -shared -fPIC;\
 		gcc -c src/drive_function.c  $(INCLUDE_DIRS) $(LIBS) $(LIB_DIRS) -o lib/libsncn_drive_function.o;\
 		ar rcs lib/libsncn_motor_drive.a lib/*.o;\

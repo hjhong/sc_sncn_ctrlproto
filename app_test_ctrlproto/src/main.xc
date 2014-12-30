@@ -1,20 +1,17 @@
+/* PLEASE REPLACE "CORE_BOARD_REQUIRED" AND "IMF_BOARD_REQUIRED" WIT A APPROPRIATE BOARD SUPPORT FILE FROM module_board-support */
+#include <CORE_C22-rev-a.inc>
+#include <COM_ECAT-rev-a.inc>
 
 /**
  * @file main.xc
  * @brief Test application for Ctrlproto on Somanet
- * @author Frank Jeschke <jeschke@fjes.de>
- * @author Christian Holl <choll@synapticon.com>
+ * @author Synapticon GmbH <support@synapticon.com>
  */
 
-#include <platform.h>
-#include <xs1.h>
 #include <ethercat.h>
 #include <print.h>
 #include <ctrlproto.h>
 #include <flash_somanet.h>
-#include <ioports.h>
-
-#define COM_TILE 0
 
 /* Test application handling pdos from EtherCat */
 static void pdo_handler(chanend coe_out, chanend pdo_out, chanend pdo_in)
@@ -100,7 +97,6 @@ int main(void)
 	chan foe_out;  		// File from consumer to module_ethercat
 	chan pdo_in;
 	chan pdo_out;
-	chan c_sig;
 
 	par
 	{
